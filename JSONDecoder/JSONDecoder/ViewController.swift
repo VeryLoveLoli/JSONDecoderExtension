@@ -35,10 +35,11 @@
     原理：每个`case`即是一个`class`、`struct`，如果`enum`已设置类型，则`case`就为该类型
  
  8.网络返回固定参数，结果参数类型结构多样性
-    方案：多样性类型结构参数使用`Decoder?`解码类型接收
+    方案一：多样性类型结构参数使用`Decoder?`解码类型接收
+    方案二：外部传入类型
  
  
- 为方便使用，基本类型设置为必须值，其它类型设置为可选值
+ 为方便使用，除模型属性外（避免模型包含模型无限循环），其它类型均设置为必须值
  */
 
 import UIKit
@@ -188,6 +189,10 @@ class ViewController: UIViewController {
     func testIssue_8() {
         
         /**
+         方案一
+         */
+        
+        /**
          多样结构类型：字典
          */
         do {
@@ -233,6 +238,43 @@ class ViewController: UIViewController {
                 let resultModel = try Int.init(from: result)
                 print(resultModel)
             }
+            
+        } catch {
+            print(error.localizedDescription)
+        }
+        
+        /**
+         方案二
+         */
+        
+        /**
+         多样结构类型：字典
+         */
+        do {
+            let model = try JSONDecoder().decode(NetworkResponseResult<Model_1>.self, from: NetworkResponse.data_dict)
+            print(model)
+            
+        } catch {
+            print(error.localizedDescription)
+        }
+        
+        /**
+         多样结构类型：数组
+         */
+        do {
+            let model = try JSONDecoder().decode(NetworkResponseResult<[Model_1]>.self, from: NetworkResponse.data_array)
+            print(model)
+            
+        } catch {
+            print(error.localizedDescription)
+        }
+        
+        /**
+         多样结构类型：基本类型
+         */
+        do {
+            let model = try JSONDecoder().decode(NetworkResponseResult<Int>.self, from: NetworkResponse.data_int)
+            print(model)
             
         } catch {
             print(error.localizedDescription)

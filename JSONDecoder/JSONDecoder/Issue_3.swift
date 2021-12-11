@@ -8,7 +8,7 @@
 import Foundation
 
 /**
- `JSON`字段类型可能多个（仅基本类型：`String`、`Int`、`Bool`、`Double`、`Float`）
+ `JSON`字段类型可能多个（仅基本类型：`String`、`Int`、`Bool`、`Double`、`Float`，`Array`必须值转为`[]`，其余做空处理）
     方案：扩展`KeyedDecodingContainer`重新实现`decode`（属性是必须值调用）、`decodeIfPresent`（属性是可选值 `?`调用）方法
  */
 

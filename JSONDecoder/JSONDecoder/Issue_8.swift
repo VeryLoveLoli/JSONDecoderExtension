@@ -9,11 +9,12 @@ import Foundation
 
 /**
  网络返回固定参数，结果参数类型结构多样性
-    方案：多样性类型结构参数使用`Decoder?`解码类型接收
+    方案一：多样性类型结构参数使用`Decoder?`解码类型接收
+    方案二：外部传入类型
  */
 
 /**
- 网络响应
+ 网络响应（方案一）
  */
 struct NetworkResponse: Decodable {
     
@@ -76,4 +77,17 @@ struct NetworkResponse: Decodable {
         /// 获取参数值解码器
         result = try? container.superDecoder(forKey: .result)
     }
+}
+
+/**
+ 网络响应结果（方案二）
+ */
+struct NetworkResponseResult<Result>: Codable where Result: Codable {
+    
+    /// 状态
+    var status: Int
+    /// 消息
+    var message: String
+    /// 结果
+    var result: Result?
 }

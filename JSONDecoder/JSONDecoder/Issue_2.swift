@@ -8,7 +8,7 @@
 import Foundation
 
 /**
- `JSON`没有该字段，属性为必须值，需加上一个默认值（仅基本类型：`String`、`Int`、`Bool`、`Double`、`Float`）
+ `JSON`没有该字段，属性为必须值，需加上一个默认值（仅基本类型：`String`、`Int`、`Bool`、`Double`、`Float`、`Array`）
     方案一：扩展`KeyedDecodingContainer`重新实现`decode`（属性是必须值调用）
     方案二：`class`或`struct`内，重写`init(from decoder: Decoder) throws`解析方法
  */

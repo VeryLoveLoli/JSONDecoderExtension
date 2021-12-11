@@ -13,9 +13,14 @@ import Foundation
  `init(from decoder: Decoder) throws`默认会调用`decode(_,forkey:)`、`decodeIfPresent(_,forkey:)`方法
  重写`init(from decoder: Decoder) throws`后需手动调用解码方法
  
- 以下重写方法（仅基本类型）
- `decode(_,forkey:)`无值时提供一个`type.init()`默认值
+ 解决字段类型不正确、无字段引起的崩溃，返回类型初始化值或`nil`
+ 
+ 以下重写方法（基本类型、数组）
+ `decode(_,forkey:)` `null`、无字段、字段类型不正确时提供一个`type.init()`默认值
  `decodeIfPresent(_,forkey:)`值是其它基本类型值时，进行转换
+ 
+ 其余类型（字典）
+ 字典`null`、无字段、字段类型不正确 返回`nil`
  */
 public extension KeyedDecodingContainer {
     
@@ -119,11 +124,23 @@ public extension KeyedDecodingContainer {
         return type.init()
     }
     
-    /* 不是基本类型无需重新设置默认值，避免必须值无限嵌套
+    /*
+     字典类型无需重新设置默认值，避免必须值无限嵌套
+    */
     func decode<T>(_ type: T.Type, forKey key: KeyedDecodingContainer<K>.Key) throws -> T where T : Decodable {
         
+        if let value = try? decodeIfPresent(type, forKey: key) { return value }
+        
+        if let data = "[]".data(using: .utf8), let value = try? JSONDecoder().decode(type, from: data) {
+            
+            return value
+        }
+        
+        let decoder = try superDecoder(forKey: key)
+        let container = try decoder.singleValueContainer()
+        
+        return try container.decode(type)
     }
-    */
     
     // MARK: - 可选值调用`?`
     
@@ -401,10 +418,13 @@ public extension KeyedDecodingContainer {
         return nil
     }
     
-    /* 不是基本类型，使用默认解析
     func decodeIfPresent<T>(_ type: T.Type, forKey key: KeyedDecodingContainer<K>.Key) throws -> T? where T : Decodable {
+        
+        guard let decoder = try? superDecoder(forKey: key) else { return nil }
+        guard let container = try? decoder.singleValueContainer() else { return nil }
+        
+        if let value = try? container.decode(type) { return value }
         
         return nil
     }
-    */
 }
